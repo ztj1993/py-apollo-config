@@ -70,4 +70,12 @@ class ApolloConfig(object):
             if tmp is not None: value = tmp
         if value is None and default is not None:
             value = default
+        if isinstance(value, dict):
+            value = ResultDict(value)
         return value
+
+
+class ResultDict(ConfigRegistry):
+    def get(self, key='', default=None, empty=False):
+        key = key.replace('_', '.')
+        return super().get(key, default, empty)
