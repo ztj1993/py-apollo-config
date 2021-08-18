@@ -11,22 +11,22 @@ from ConfigRegistry import ConfigRegistry
 class ApolloConfig(object):
     def __init__(self, prefix):
         self._apollo = None
-        self._setting = None
+        self._registry = None
         self.prefix = (prefix if prefix.endswith('_') else prefix + '_').upper()
 
     @property
-    def setting(self):
-        if self._setting is None:
-            self._setting = ConfigRegistry()
-        return self._setting
+    def registry(self):
+        if self._registry is None:
+            self._registry = ConfigRegistry()
+        return self._registry
 
-    @setting.setter
-    def setting(self, value):
+    @registry.setter
+    def registry(self, value):
         if isinstance(value, dict):
             value = ConfigRegistry(value)
-        elif isinstance(value, ConfigRegistry):
-            raise ValueError('setting is not ConfigRegistry')
-        self._setting = value
+        elif not isinstance(value, ConfigRegistry):
+            raise ValueError('value is not ConfigRegistry')
+        self._registry = value
 
     @property
     def apollo(self):
@@ -42,29 +42,29 @@ class ApolloConfig(object):
     @apollo.setter
     def apollo(self, value):
         if not isinstance(value, ApolloClient):
-            raise ValueError('apollo is not ApolloClient')
+            raise ValueError('value is not ApolloClient')
         self._apollo = value
 
     def init(self):
         self.apollo.pull()
         for key, val in self.apollo.setting.items():
-            self.setting.set(key, val)
+            self.registry.set(key, val)
 
         for key, value in os.environ.items():
             if not key.startswith(self.prefix): continue
             key = key[len(self.prefix):].lower().replace('_', '.')
             if not key: return False
-            self.setting.set(key, value)
+            self.registry.set(key, value)
 
-    def get(self, key, default=None, apollo=False, env=False):
-        value = self.setting.get(key)
-        if apollo is True:
+    def get(self, key=None, default=None, apollo=False, env=False):
+        value = self.registry.get(key)
+        if value is not None and apollo is True:
             try:
                 tmp = self.apollo.get(key, cache=False)
                 if tmp is not None: value = tmp
             except:
                 pass
-        if env is True:
+        if value is not None and env is True:
             name = self.prefix + key.upper()
             tmp = os.environ.get(name)
             if tmp is not None: value = tmp

@@ -12,7 +12,7 @@ f.close()
 
 setup(
     name='py-apollo-config',
-    version='0.0.1',
+    version='1.0.0',
     description='python apollo config',
     long_description=readme,
     long_description_content_type='text/markdown',
