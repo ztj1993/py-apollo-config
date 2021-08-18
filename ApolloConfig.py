@@ -59,10 +59,15 @@ class ApolloConfig(object):
     def get(self, key, default=None, apollo=False, env=False):
         value = self.setting.get(key)
         if apollo is True:
-            value = self.apollo.get(key, cache=False)
+            try:
+                tmp = self.apollo.get(key, cache=False)
+                if tmp is not None: value = tmp
+            except:
+                pass
         if env is True:
             name = self.prefix + key.upper()
-            value = os.environ.get(name)
+            tmp = os.environ.get(name)
+            if tmp is not None: value = tmp
         if value is None and default is not None:
             value = default
         return value
