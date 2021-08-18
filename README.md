@@ -20,7 +20,7 @@ pip install py-apollo-config
 ### 依赖
 
 ```
-pip install apollo-client
+pip install config-registry
 pip install py-apollo-client
 ```
 
