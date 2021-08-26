@@ -45,10 +45,11 @@ class ApolloConfig(object):
             raise ValueError('value is not ApolloClient')
         self._apollo = value
 
-    def init(self):
-        self.apollo.pull()
-        for key, val in self.apollo.setting.items():
-            self.registry.set(key, val)
+    def init(self, apollo=True):
+        if apollo is True:
+            self.apollo.pull()
+            for key, val in self.apollo.setting.items():
+                self.registry.set(key, val)
 
         for key, value in os.environ.items():
             if not key.startswith(self.prefix): continue
